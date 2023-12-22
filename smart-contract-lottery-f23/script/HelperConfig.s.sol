@@ -4,6 +4,7 @@ pragma solidity 0.8.19;
 
 import {Script} from "forge-std/Script.sol";
 import {VRFCoordinatorV2Mock} from "@chainlink/contracts/src/v0.8/mocks/VRFCoordinatorV2Mock.sol";
+import {LinkToken} from "../test/mocks/LinkToken.sol";
 
 contract HelperConfig is Script {
     NetworkConfig public activeNetworkConfig;
@@ -15,6 +16,7 @@ contract HelperConfig is Script {
         bytes32 gaslane;
         uint64 subscriptionId;
         uint32 callbackGasLimit;
+        address link;
     }
 
     uint256 public DEFAULT_ANVIL_PRIVATE_KEY =
@@ -41,7 +43,8 @@ contract HelperConfig is Script {
             interval: 30,
             entranceFee: 0.01 ether,
             callbackGasLimit: 500000,
-            vrfCoordinator: 0x8103B0A8A00be2DDC778e6e7eaa21791Cd364625
+            vrfCoordinator: 0x8103B0A8A00be2DDC778e6e7eaa21791Cd364625,
+            link: 0x514910771AF9Ca656af840dff83E8264EcF986CA
         });
     }
 
@@ -61,7 +64,7 @@ contract HelperConfig is Script {
             baseFee,
             gasPriceLink
         );
-
+        LinkToken link = new LinkToken();
         vm.stopBroadcast();
 
         emit HelperConfig__CreatedMockVRFCoordinator(
@@ -74,7 +77,8 @@ contract HelperConfig is Script {
             interval: 30,
             entranceFee: 0.01 ether,
             callbackGasLimit: 500000,
-            vrfCoordinator: address(vrfCoordinatorV2Mock)
+            vrfCoordinator: address(vrfCoordinatorV2Mock),
+            link: address(link)
         });
     }
 }
