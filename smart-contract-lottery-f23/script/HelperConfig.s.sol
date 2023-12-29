@@ -17,6 +17,7 @@ contract HelperConfig is Script {
         uint64 subscriptionId;
         uint32 callbackGasLimit;
         address link;
+        uint256 deployerKey;
     }
 
     uint256 public DEFAULT_ANVIL_PRIVATE_KEY =
@@ -34,7 +35,7 @@ contract HelperConfig is Script {
 
     function getSepoliaEthConfig()
         public
-        pure
+        view
         returns (NetworkConfig memory sepoliaNetworkConfig)
     {
         sepoliaNetworkConfig = NetworkConfig({
@@ -44,7 +45,8 @@ contract HelperConfig is Script {
             entranceFee: 0.01 ether,
             callbackGasLimit: 500000,
             vrfCoordinator: 0x8103B0A8A00be2DDC778e6e7eaa21791Cd364625,
-            link: 0x514910771AF9Ca656af840dff83E8264EcF986CA
+            link: 0x514910771AF9Ca656af840dff83E8264EcF986CA,
+            deployerKey: vm.envUint("PRIVATE_KEY")
         });
     }
 
@@ -78,7 +80,8 @@ contract HelperConfig is Script {
             entranceFee: 0.01 ether,
             callbackGasLimit: 500000,
             vrfCoordinator: address(vrfCoordinatorV2Mock),
-            link: address(link)
+            link: address(link),
+            deployerKey: DEFAULT_ANVIL_PRIVATE_KEY
         });
     }
 }
