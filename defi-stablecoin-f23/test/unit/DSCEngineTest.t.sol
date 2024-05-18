@@ -7,6 +7,7 @@ import {DecentralizedStablecoin} from "../../src/DecentralizedStablecoin.sol";
 import {DSCEngine} from "../../src/DSCEngine.sol";
 import {HelperConfig} from "../../script/HelperConfig.s.sol";
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/ERC20Mock.sol";
+import {MockV3Aggregator} from "../mocks/MockV3Aggregator.sol";
 
 contract DSCEngineTest is Test {
     DeployDSC deployer;
@@ -16,6 +17,8 @@ contract DSCEngineTest is Test {
     address ethUsdPriceFeed;
     address btcUsdPriceFeed;
     address weth;
+
+    uint256 amountToMint = 100 ether;
 
     address public USER = makeAddr("USER");
     uint256 public constant AMOUNT_COLLATERAL = 10 ether;
@@ -94,7 +97,7 @@ contract DSCEngineTest is Test {
     modifier depositedCollateralAndMintedDsc() {
         vm.startPrank(USER);
         ERC20Mock(weth).approve(address(dsce), AMOUNT_COLLATERAL);
-        dsce.depositCollateralAndMintDSC(weth, AMOUNT_COLLATERAL, STARTING_ERC20_BALANCE);
+        dsce.depositCollateralAndMintDSC(weth, AMOUNT_COLLATERAL, amountToMint);
         vm.stopPrank();
         _;
     }
@@ -201,5 +204,24 @@ contract DSCEngineTest is Test {
     function testCanBurnDsc() public depositedCollateralAndMintedDsc {
         uint256 userBalance = dsc.balanceOf(USER);
         assertEq(userBalance, 0);
+    }
+
+    // mint dsc tests
+
+    function testRevertsIfMintAmountIsZero() public {
+        vm.startPrank(USER);
+        ERC20Mock(weth).approve(address(dsce), AMOUNT_COLLATERAL);
+        dsce.depositCollateralAndMintDSC(weth, AMOUNT_COLLATERAL, amountToMint);
+        vm.expectRevert(DSCEngine.DSCEngine__NeedsMoreThanZero.selector);
+        dsce.mintDsc(0);
+        vm.stopPrank();
+    }
+
+    function testCanMintDsc() public depositedCollateral {
+        vm.prank(USER);
+        dsce.mintDsc(amountToMint);
+
+        uint256 userBalance = dsc.balanceOf(USER);
+        assertEq(userBalance, amountToMint);
     }
 }
