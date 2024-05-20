@@ -145,8 +145,6 @@ contract DSCEngine is ReentrancyGuard {
         _revertIfHealthFactorIsBroken(msg.sender);
     }
 
-    function getHealthFactor(address _user) external {}
-
     // low level internal function
     // do not call unless the function calling it is checking for health factors being broken
     function _burnDsc(uint256 _amountDscToBurn, address _onBehalfOf, address _dscFrom) private {
@@ -230,5 +228,33 @@ contract DSCEngine is ReentrancyGuard {
     {
         totalDscMinted = s_dscMinted[_user];
         collateralValueInUsd = getAccountCollateralValue(_user);
+    }
+
+    function getCollateralTokens() external view returns (address[] memory) {
+        return s_collateralTokens;
+    }
+
+    function getCollateralTokenPriceFeed(address token) external view returns (address) {
+        return s_priceFeeds[token];
+    }
+
+    function getCollateralBalanceOfUser(address user, address token) external view returns (uint256) {
+        return s_collateralDeposited[user][token];
+    }
+
+    function getMinHealthFactor() external pure returns (uint256) {
+        return MIN_HEALTH_FACTOR;
+    }
+
+    function getHealthFactor(address user) external view returns (uint256) {
+        return _healthFactor(user);
+    }
+
+    function getPrecision() external pure returns (uint256) {
+        return PRECISION;
+    }
+
+    function getLiquidationBonus() external pure returns (uint256) {
+        return LIQUIDATION_BONUS;
     }
 }

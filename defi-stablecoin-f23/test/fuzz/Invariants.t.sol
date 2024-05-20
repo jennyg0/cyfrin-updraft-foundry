@@ -33,4 +33,11 @@ contract InvariantsTest is StdInvariant, Test {
         uint256 wbtcValue = dsce.getUsdValue(wbtc, totalWbtcDeposited);
         assert(wethValue + wbtcValue >= totalSupply);
     }
+
+    // add all getter funcs here
+    // run 'forge inspect DSCEngine methods' to check
+    function invariant_gettersShouldNotRevert() public view {
+        dsce.getLiquidationBonus();
+        dsce.getPrecision();
+    }
 }
