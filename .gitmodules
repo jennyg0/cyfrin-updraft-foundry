@@ -76,3 +76,6 @@
 [submodule "merkle-airdrop-f24/lib/murky"]
 	path = merkle-airdrop-f24/lib/murky
 	url = https://github.com/dmfxyz/murky
+[submodule "merkle-airdrop-f24/lib/foundry-devops"]
+	path = merkle-airdrop-f24/lib/foundry-devops
+	url = https://github.com/cyfrin/foundry-devops
