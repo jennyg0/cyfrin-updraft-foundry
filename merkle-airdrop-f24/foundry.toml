@@ -4,5 +4,6 @@ out = "out"
 libs = ["lib"]
 fs_permissions = [{access = "read-write", path = "./"}]
 remappings=["@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/","forge-std=lib/forge-std/src/", "murky=lib/murky", "foundry-devops/=lib/foundry-devops/"]
+solc = "0.8.20"
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
