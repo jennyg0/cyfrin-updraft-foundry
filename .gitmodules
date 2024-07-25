@@ -79,3 +79,6 @@
 [submodule "merkle-airdrop-f24/lib/foundry-devops"]
 	path = merkle-airdrop-f24/lib/foundry-devops
 	url = https://github.com/cyfrin/foundry-devops
+[submodule "account-abstraction-f24/lib/forge-std"]
+	path = account-abstraction-f24/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
