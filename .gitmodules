@@ -85,3 +85,6 @@
 [submodule "account-abstraction-f24/lib/account-abstraction"]
 	path = account-abstraction-f24/lib/account-abstraction
 	url = https://github.com/eth-infinitism/account-abstraction
+[submodule "account-abstraction-f24/lib/openzeppelin-contracts"]
+	path = account-abstraction-f24/lib/openzeppelin-contracts
+	url = https://github.com/openzeppelin/openzeppelin-contracts
