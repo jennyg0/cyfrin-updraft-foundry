@@ -32,11 +32,11 @@ contract HelperConfig is Script {
      networkConfigs[ZKSYNC_MAINNET_CHAIN_ID] = getZkSyncConfig();
     }
 
-        function getConfig() public view returns (NetworkConfig memory) {
+        function getConfig() public returns (NetworkConfig memory) {
         return getConfigByChainId(block.chainid);
     }
 
-    function getConfigByChainId(uint256 chainId) public view returns (NetworkConfig memory) {
+    function getConfigByChainId(uint256 chainId) public returns (NetworkConfig memory) {
         if (chainId == LOCAL_CHAIN_ID) {
             return getOrCreateAnvilEthConfig();
         } else if (networkConfigs[chainId].account != address(0)) {
@@ -81,10 +81,20 @@ contract HelperConfig is Script {
         });
     }
 
-    function getOrCreateAnvilEthConfig() public view returns (NetworkConfig memory) {
+    function getOrCreateAnvilEthConfig() public returns (NetworkConfig memory) {
         if (localNetworkConfig.account != address(0)) {
             return localNetworkConfig;
         }
+
+        // deploy mocks
+        console2.log("Deploying mocks...");
+        vm.startBroadcast(ANVIL_DEFAULT_ACCOUNT);
+        EntryPoint entryPoint = new EntryPoint();
+        vm.stopBroadcast();
+        console2.log("Mocks deployed!");
+
+        localNetworkConfig =
+            NetworkConfig({entryPoint: address(entryPoint), account: ANVIL_DEFAULT_ACCOUNT});
         return localNetworkConfig;
     }
 }
