@@ -11,28 +11,55 @@ import {MinimalAccount} from "src/ethereum/MinimalAccount.sol";
 // import {DevOpsTools} from "lib/foundry-devops/src/DevOpsTools.sol";
 
 contract SendPackedUserOp is Script {
-  function run() public{}
+    using MessageHashUtils for bytes32;
 
-  function generatedSignedUserOperation(bytes memory callData, address sender) public returns(PackedUserOperation memory) {
-    uint256 nonce = vm.getNonce(sender);
-    PackedUserOperation memory unsignedUserOp = _generateUnsignedUserOperation(callData, sender, nonce);
-  }
+    function run() public {}
 
-  function _generateUnsignedUserOperation(bytes memory callData, address sender, uint256 nonce) internal pure returns (PackedUserOperation memory) {
-    uint128 verificationGasLimit = 16777216;
-    uint128 callGasLimit = verificationGasLimit;
-    uint128 maxPriorityFeePerGas = 256;
-    uint128 maxFeePerGas = maxPriorityFeePerGas;
-    return PackedUserOperation({
-        sender: sender,
-        nonce: nonce,
-        initCode: hex"",
-        callData: callData,
-        accountGasLimits: bytes32(uint256(verificationGasLimit) << 128 | callGasLimit),
-        preVerificationGas: verificationGasLimit,
-        gasFees: bytes32(uint256(maxPriorityFeePerGas) << 128 | maxFeePerGas),
-        paymasterAndData: hex"",
-        signature: hex""
-    });
-  }
+    function generateSignedUserOperation(
+        bytes memory callData,
+        HelperConfig.NetworkConfig memory config
+    ) public returns (PackedUserOperation memory) {
+        uint256 nonce = vm.getNonce(config.account);
+        PackedUserOperation memory userOp = _generateUnsignedUserOperation(
+            callData,
+            config.account,
+            nonce
+        );
+
+        bytes32 userOpHash = IEntryPoint(config.entryPoint).getUserOpHash(
+            userOp
+        );
+        bytes32 digest = userOpHash.toEthSignedMessageHash();
+
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(config.account, digest);
+        userOp.signature = abi.encodePacked(r, s, v);
+        return userOp;
+    }
+
+    function _generateUnsignedUserOperation(
+        bytes memory callData,
+        address sender,
+        uint256 nonce
+    ) internal pure returns (PackedUserOperation memory) {
+        uint128 verificationGasLimit = 16777216;
+        uint128 callGasLimit = verificationGasLimit;
+        uint128 maxPriorityFeePerGas = 256;
+        uint128 maxFeePerGas = maxPriorityFeePerGas;
+        return
+            PackedUserOperation({
+                sender: sender,
+                nonce: nonce,
+                initCode: hex"",
+                callData: callData,
+                accountGasLimits: bytes32(
+                    (uint256(verificationGasLimit) << 128) | callGasLimit
+                ),
+                preVerificationGas: verificationGasLimit,
+                gasFees: bytes32(
+                    (uint256(maxPriorityFeePerGas) << 128) | maxFeePerGas
+                ),
+                paymasterAndData: hex"",
+                signature: hex""
+            });
+    }
 }
