@@ -80,7 +80,8 @@ contract MinimalAccountTest is Test {
         PackedUserOperation memory packedUserOp = sendPackedUserOp
             .generateSignedUserOperation(
                 executeCallData,
-                helperConfig.getConfig()
+                helperConfig.getConfig(),
+                address(minimalAccount)
             );
         bytes32 userOperationHash = IEntryPoint(
             helperConfig.getConfig().entryPoint
@@ -112,12 +113,13 @@ contract MinimalAccountTest is Test {
         PackedUserOperation memory packedUserOp = sendPackedUserOp
             .generateSignedUserOperation(
                 executeCallData,
-                helperConfig.getConfig()
+                helperConfig.getConfig(),
+                address(minimalAccount)
             );
         bytes32 userOperationHash = IEntryPoint(
             helperConfig.getConfig().entryPoint
         ).getUserOpHash(packedUserOp);
-        uint256 missingAccountFunds = 1e18;
+        uint256 missingAccountFunds = AMOUNT;
 
         vm.prank(address(helperConfig.getConfig().entryPoint));
         uint256 validationData = minimalAccount.validateUserOp(
@@ -146,10 +148,11 @@ contract MinimalAccountTest is Test {
         PackedUserOperation memory packedUserOp = sendPackedUserOp
             .generateSignedUserOperation(
                 executeCallData,
-                helperConfig.getConfig()
+                helperConfig.getConfig(),
+                address(minimalAccount)
             );
 
-        vm.deal(address(minimalAccount), 1e18);
+        vm.deal(address(minimalAccount), AMOUNT);
 
         PackedUserOperation[] memory ops = new PackedUserOperation[](1);
         ops[0] = packedUserOp;
