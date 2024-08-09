@@ -91,3 +91,6 @@
 [submodule "account-abstraction-f24/lib/foundry-devops"]
 	path = account-abstraction-f24/lib/foundry-devops
 	url = https://github.com/cyfrin/foundry-devops
+[submodule "account-abstraction-f24/lib/foundry-era-contracts"]
+	path = account-abstraction-f24/lib/foundry-era-contracts
+	url = https://github.com/Cyfrin/foundry-era-contracts
