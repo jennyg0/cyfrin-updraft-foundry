@@ -88,3 +88,6 @@
 [submodule "account-abstraction-f24/lib/openzeppelin-contracts"]
 	path = account-abstraction-f24/lib/openzeppelin-contracts
 	url = https://github.com/openzeppelin/openzeppelin-contracts
+[submodule "account-abstraction-f24/lib/foundry-devops"]
+	path = account-abstraction-f24/lib/foundry-devops
+	url = https://github.com/cyfrin/foundry-devops
