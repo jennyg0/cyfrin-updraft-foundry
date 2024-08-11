@@ -10,10 +10,7 @@ contract DeployMinimal is Script {
         deployMinimalAccount();
     }
 
-    function deployMinimalAccount()
-        public
-        returns (HelperConfig, MinimalAccount)
-    {
+    function deployMinimalAccount() public returns (HelperConfig, MinimalAccount) {
         HelperConfig helperConfig = new HelperConfig();
         HelperConfig.NetworkConfig memory config = helperConfig.getConfig();
 

@@ -14,43 +14,25 @@ contract SendPackedUserOp is Script {
     using MessageHashUtils for bytes32;
 
     // Make sure you trust this user - don't run this on Mainnet!
-    address constant RANDOM_APPROVER =
-        0x9EA9b0cc1919def1A3CfAEF4F7A66eE3c36F86fC;
+    address constant RANDOM_APPROVER = 0x9EA9b0cc1919def1A3CfAEF4F7A66eE3c36F86fC;
 
     function run() public {
         HelperConfig helperConfig = new HelperConfig();
         address dest = helperConfig.getConfig().usdc; // arbitrum mainnet USDC address
         uint256 value = 0;
-        address minimalAccountAddress = DevOpsTools.get_most_recent_deployment(
-            "MinimalAccount",
-            block.chainid
-        );
+        address minimalAccountAddress = DevOpsTools.get_most_recent_deployment("MinimalAccount", block.chainid);
 
-        bytes memory functionData = abi.encodeWithSelector(
-            IERC20.approve.selector,
-            RANDOM_APPROVER,
-            1e18
-        );
-        bytes memory executeCalldata = abi.encodeWithSelector(
-            MinimalAccount.execute.selector,
-            dest,
-            value,
-            functionData
-        );
-        PackedUserOperation memory userOp = generateSignedUserOperation(
-            executeCalldata,
-            helperConfig.getConfig(),
-            minimalAccountAddress
-        );
+        bytes memory functionData = abi.encodeWithSelector(IERC20.approve.selector, RANDOM_APPROVER, 1e18);
+        bytes memory executeCalldata =
+            abi.encodeWithSelector(MinimalAccount.execute.selector, dest, value, functionData);
+        PackedUserOperation memory userOp =
+            generateSignedUserOperation(executeCalldata, helperConfig.getConfig(), minimalAccountAddress);
         PackedUserOperation[] memory ops = new PackedUserOperation[](1);
         ops[0] = userOp;
 
         // Send transaction
         vm.startBroadcast();
-        IEntryPoint(helperConfig.getConfig().entryPoint).handleOps(
-            ops,
-            payable(helperConfig.getConfig().account)
-        );
+        IEntryPoint(helperConfig.getConfig().entryPoint).handleOps(ops, payable(helperConfig.getConfig().account));
         vm.stopBroadcast();
     }
 
@@ -60,15 +42,9 @@ contract SendPackedUserOp is Script {
         address minimalAccount
     ) public view returns (PackedUserOperation memory) {
         uint256 nonce = vm.getNonce(minimalAccount) - 1;
-        PackedUserOperation memory userOp = _generateUnsignedUserOperation(
-            callData,
-            minimalAccount,
-            nonce
-        );
+        PackedUserOperation memory userOp = _generateUnsignedUserOperation(callData, minimalAccount, nonce);
 
-        bytes32 userOpHash = IEntryPoint(config.entryPoint).getUserOpHash(
-            userOp
-        );
+        bytes32 userOpHash = IEntryPoint(config.entryPoint).getUserOpHash(userOp);
         bytes32 digest = userOpHash.toEthSignedMessageHash();
 
         uint8 v;
@@ -84,30 +60,25 @@ contract SendPackedUserOp is Script {
         return userOp;
     }
 
-    function _generateUnsignedUserOperation(
-        bytes memory callData,
-        address sender,
-        uint256 nonce
-    ) internal pure returns (PackedUserOperation memory) {
+    function _generateUnsignedUserOperation(bytes memory callData, address sender, uint256 nonce)
+        internal
+        pure
+        returns (PackedUserOperation memory)
+    {
         uint128 verificationGasLimit = 16777216;
         uint128 callGasLimit = verificationGasLimit;
         uint128 maxPriorityFeePerGas = 256;
         uint128 maxFeePerGas = maxPriorityFeePerGas;
-        return
-            PackedUserOperation({
-                sender: sender,
-                nonce: nonce,
-                initCode: hex"",
-                callData: callData,
-                accountGasLimits: bytes32(
-                    (uint256(verificationGasLimit) << 128) | callGasLimit
-                ),
-                preVerificationGas: verificationGasLimit,
-                gasFees: bytes32(
-                    (uint256(maxPriorityFeePerGas) << 128) | maxFeePerGas
-                ),
-                paymasterAndData: hex"",
-                signature: hex""
-            });
+        return PackedUserOperation({
+            sender: sender,
+            nonce: nonce,
+            initCode: hex"",
+            callData: callData,
+            accountGasLimits: bytes32((uint256(verificationGasLimit) << 128) | callGasLimit),
+            preVerificationGas: verificationGasLimit,
+            gasFees: bytes32((uint256(maxPriorityFeePerGas) << 128) | maxFeePerGas),
+            paymasterAndData: hex"",
+            signature: hex""
+        });
     }
 }
